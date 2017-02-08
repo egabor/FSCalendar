@@ -40,7 +40,7 @@
 {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        [self commonInit];
+        //[self commonInit];
     }
     return self;
 }
