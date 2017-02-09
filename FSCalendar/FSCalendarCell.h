@@ -19,13 +19,16 @@ typedef NS_ENUM(NSUInteger, FSCalendarMonthPosition);
 /**
  The day text label of the cell
  */
-@property (weak, nonatomic) UILabel  *titleLabel;
+@property (weak, nonatomic) IBOutlet UILabel  *titleLabel;
+@property (weak, nonatomic) IBOutlet UILabel  *expenseLabel;
+@property (weak, nonatomic) IBOutlet UILabel  *incomeLabel;
+@property (weak, nonatomic) IBOutlet UILabel  *paddingView;
+
 
 
 /**
  The subtitle label of the cell
  */
-@property (weak, nonatomic) UILabel  *subtitleLabel;
 
 
 /**
@@ -55,7 +58,8 @@ typedef NS_ENUM(NSUInteger, FSCalendarMonthPosition);
 @property (weak, nonatomic) FSCalendarAppearance *appearance;
 
 @property (strong, nonatomic) NSString *title;
-@property (strong, nonatomic) NSString *subtitle;
+@property (strong, nonatomic) NSString *expense;
+@property (strong, nonatomic) NSString *income;
 @property (strong, nonatomic) UIImage  *image;
 @property (assign, nonatomic) FSCalendarMonthPosition monthPosition;
 
@@ -67,12 +71,15 @@ typedef NS_ENUM(NSUInteger, FSCalendarMonthPosition);
 @property (strong, nonatomic) UIColor *preferredFillSelectionColor;
 @property (strong, nonatomic) UIColor *preferredTitleDefaultColor;
 @property (strong, nonatomic) UIColor *preferredTitleSelectionColor;
-@property (strong, nonatomic) UIColor *preferredSubtitleDefaultColor;
-@property (strong, nonatomic) UIColor *preferredSubtitleSelectionColor;
+@property (strong, nonatomic) UIColor *preferredExpenseDefaultColor;
+@property (strong, nonatomic) UIColor *preferredExpenseSelectionColor;
+@property (strong, nonatomic) UIColor *preferredIncomeDefaultColor;
+@property (strong, nonatomic) UIColor *preferredIncomeSelectionColor;
 @property (strong, nonatomic) UIColor *preferredBorderDefaultColor;
 @property (strong, nonatomic) UIColor *preferredBorderSelectionColor;
 @property (assign, nonatomic) CGPoint preferredTitleOffset;
-@property (assign, nonatomic) CGPoint preferredSubtitleOffset;
+@property (assign, nonatomic) CGPoint preferredExpenseOffset;
+@property (assign, nonatomic) CGPoint preferredIncomeOffset;
 @property (assign, nonatomic) CGPoint preferredImageOffset;
 @property (assign, nonatomic) CGPoint preferredEventOffset;
 

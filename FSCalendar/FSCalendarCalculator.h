@@ -24,7 +24,8 @@ typedef struct FSCalendarCoordinate FSCalendarCoordinate;
 @property (weak  , nonatomic) FSCalendar *calendar;
 
 @property (assign, nonatomic) CGFloat titleHeight;
-@property (assign, nonatomic) CGFloat subtitleHeight;
+@property (assign, nonatomic) CGFloat expenseHeight;
+@property (assign, nonatomic) CGFloat incomeHeight;
 
 @property (readonly, nonatomic) NSInteger numberOfSections;
 

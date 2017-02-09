@@ -39,8 +39,9 @@
     if (self) {
         self.calendar = calendar;
         self.titleHeight = FSCalendarAutomaticDimension;
-        self.subtitleHeight = FSCalendarAutomaticDimension;
-        
+        self.expenseHeight = FSCalendarAutomaticDimension;
+        self.incomeHeight = FSCalendarAutomaticDimension;
+
         self.months = [NSMutableDictionary dictionary];
         self.monthHeads = [NSMutableDictionary dictionary];
         self.weeks = [NSMutableDictionary dictionary];
@@ -74,12 +75,20 @@
     return _titleHeight;
 }
 
-- (CGFloat)subtitleHeight
+- (CGFloat)expenseHeight
 {
-    if (_subtitleHeight == FSCalendarAutomaticDimension) {
-        _subtitleHeight = [@"1" sizeWithAttributes:@{NSFontAttributeName:self.calendar.appearance.subtitleFont}].height;
+    if (_expenseHeight == FSCalendarAutomaticDimension) {
+        _expenseHeight = [@"1" sizeWithAttributes:@{NSFontAttributeName:self.calendar.appearance.expenseFont}].height;
     }
-    return _subtitleHeight;
+    return _expenseHeight;
+}
+
+- (CGFloat)incomeHeight
+{
+    if (_incomeHeight == FSCalendarAutomaticDimension) {
+        _incomeHeight = [@"1" sizeWithAttributes:@{NSFontAttributeName:self.calendar.appearance.incomeFont}].height;
+    }
+    return _incomeHeight;
 }
 
 #pragma mark - Public functions

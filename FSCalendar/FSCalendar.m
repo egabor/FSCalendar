@@ -218,8 +218,8 @@ typedef NS_ENUM(NSUInteger, FSCalendarOrientation) {
     collectionView.showsVerticalScrollIndicator = NO;
     collectionView.allowsMultipleSelection = NO;
     collectionView.clipsToBounds = YES;
-    [collectionView registerNib:[UINib nibWithNibName:@"FSCalendarCell" bundle:nil] forCellWithReuseIdentifier:FSCalendarDefaultCellReuseIdentifier];
-    //[collectionView registerClass:[FSCalendarCell class] forCellWithReuseIdentifier:FSCalendarDefaultCellReuseIdentifier];
+    //[collectionView registerNib:[UINib nibWithNibName:@"FSCalendarCell" bundle:nil] forCellWithReuseIdentifier:FSCalendarDefaultCellReuseIdentifier];
+    [collectionView registerClass:[FSCalendarCell class] forCellWithReuseIdentifier:FSCalendarDefaultCellReuseIdentifier];
     [collectionView registerClass:[FSCalendarBlankCell class] forCellWithReuseIdentifier:FSCalendarBlankCellReuseIdentifier];
     [collectionView registerClass:[FSCalendarStickyHeader class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"header"];
     [collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"placeholderHeader"];
@@ -487,6 +487,8 @@ typedef NS_ENUM(NSUInteger, FSCalendarOrientation) {
     if (!cell) {
         cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:FSCalendarDefaultCellReuseIdentifier forIndexPath:indexPath];
     }
+    cell.expense = @"300";
+    cell.income = @"400";
     [self reloadDataForCell:cell atIndexPath:indexPath];
     return cell;
 }
@@ -1511,10 +1513,16 @@ void FSCalendarRunLoopCallback(CFRunLoopObserverRef observer, CFRunLoopActivity 
     FSCalendarInvalidateCellAppearance(preferredTitleSelectionColor,titleSelectionColorForDate);
 
     FSCalendarInvalidateCellAppearanceWithDefault(preferredTitleOffset,titleOffsetForDate,CGPointInfinity);
-    if (cell.subtitle) {
-        FSCalendarInvalidateCellAppearance(preferredSubtitleDefaultColor,subtitleDefaultColorForDate);
-        FSCalendarInvalidateCellAppearance(preferredSubtitleSelectionColor,subtitleSelectionColorForDate);
-        FSCalendarInvalidateCellAppearanceWithDefault(preferredSubtitleOffset,subtitleOffsetForDate,CGPointInfinity);
+    if (cell.expense) {
+        FSCalendarInvalidateCellAppearance(preferredExpenseDefaultColor,expenseDefaultColorForDate);
+        FSCalendarInvalidateCellAppearance(preferredExpenseSelectionColor,expenseSelectionColorForDate);
+        FSCalendarInvalidateCellAppearanceWithDefault(preferredExpenseOffset,expenseOffsetForDate,CGPointInfinity);
+    }
+    
+    if (cell.income) {
+        FSCalendarInvalidateCellAppearance(preferredIncomeDefaultColor,incomeDefaultColorForDate);
+        FSCalendarInvalidateCellAppearance(preferredIncomeSelectionColor,incomeSelectionColorForDate);
+        FSCalendarInvalidateCellAppearanceWithDefault(preferredIncomeOffset,incomeOffsetForDate,CGPointInfinity);
     }
     if (cell.numberOfEvents) {
         FSCalendarInvalidateCellAppearance(preferredEventDefaultColors,eventDefaultColorsForDate);
@@ -1544,7 +1552,8 @@ void FSCalendarRunLoopCallback(CFRunLoopObserverRef observer, CFRunLoopActivity 
     cell.image = [self.dataSourceProxy calendar:self imageForDate:date];
     cell.numberOfEvents = [self.dataSourceProxy calendar:self numberOfEventsForDate:date];
     cell.title = [self.dataSourceProxy calendar:self titleForDate:date] ?: @([self.gregorian component:NSCalendarUnitDay fromDate:date]).stringValue;
-    cell.subtitle  = [self.dataSourceProxy calendar:self subtitleForDate:date];
+    cell.expense  = [self.dataSourceProxy calendar:self expenseForDate:date];
+    cell.income  = [self.dataSourceProxy calendar:self incomeForDate:date];
     cell.selected = [_selectedDates containsObject:date];
     cell.dateIsToday = self.today?[self.gregorian isDate:date inSameDayAsDate:self.today]:NO;
     cell.weekend = [self.gregorian isDateInWeekend:date];

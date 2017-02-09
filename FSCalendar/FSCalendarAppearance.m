@@ -18,7 +18,8 @@
 
 @property (strong, nonatomic) NSMutableDictionary *backgroundColors;
 @property (strong, nonatomic) NSMutableDictionary *titleColors;
-@property (strong, nonatomic) NSMutableDictionary *subtitleColors;
+@property (strong, nonatomic) NSMutableDictionary *expenseColors;
+@property (strong, nonatomic) NSMutableDictionary *incomeColors;
 @property (strong, nonatomic) NSMutableDictionary *borderColors;
 
 @end
@@ -31,7 +32,9 @@
     if (self) {
         
         _titleFont = [UIFont systemFontOfSize:FSCalendarStandardTitleTextSize];
-        _subtitleFont = [UIFont systemFontOfSize:FSCalendarStandardSubtitleTextSize];
+        _expenseFont = [UIFont systemFontOfSize:FSCalendarStandardSubtitleTextSize];
+        _incomeFont = [UIFont systemFontOfSize:FSCalendarStandardSubtitleTextSize];
+
         _weekdayFont = [UIFont systemFontOfSize:FSCalendarStandardWeekdayTextSize];
         _headerTitleFont = [UIFont systemFontOfSize:FSCalendarStandardHeaderTextSize];
         
@@ -55,12 +58,19 @@
         _titleColors[@(FSCalendarCellStatePlaceholder)] = [UIColor lightGrayColor];
         _titleColors[@(FSCalendarCellStateToday)]       = [UIColor whiteColor];
         
-        _subtitleColors = [NSMutableDictionary dictionaryWithCapacity:5];
-        _subtitleColors[@(FSCalendarCellStateNormal)]      = [UIColor darkGrayColor];
-        _subtitleColors[@(FSCalendarCellStateSelected)]    = [UIColor whiteColor];
-        _subtitleColors[@(FSCalendarCellStateDisabled)]    = [UIColor lightGrayColor];
-        _subtitleColors[@(FSCalendarCellStatePlaceholder)] = [UIColor lightGrayColor];
-        _subtitleColors[@(FSCalendarCellStateToday)]       = [UIColor whiteColor];
+        _expenseColors = [NSMutableDictionary dictionaryWithCapacity:5];
+        _expenseColors[@(FSCalendarCellStateNormal)]      = [UIColor darkGrayColor];
+        _expenseColors[@(FSCalendarCellStateSelected)]    = [UIColor whiteColor];
+        _expenseColors[@(FSCalendarCellStateDisabled)]    = [UIColor lightGrayColor];
+        _expenseColors[@(FSCalendarCellStatePlaceholder)] = [UIColor lightGrayColor];
+        _expenseColors[@(FSCalendarCellStateToday)]       = [UIColor whiteColor];
+        
+        _incomeColors = [NSMutableDictionary dictionaryWithCapacity:5];
+        _incomeColors[@(FSCalendarCellStateNormal)]      = [UIColor darkGrayColor];
+        _incomeColors[@(FSCalendarCellStateSelected)]    = [UIColor whiteColor];
+        _incomeColors[@(FSCalendarCellStateDisabled)]    = [UIColor lightGrayColor];
+        _incomeColors[@(FSCalendarCellStatePlaceholder)] = [UIColor lightGrayColor];
+        _incomeColors[@(FSCalendarCellStateToday)]       = [UIColor whiteColor];
         
         _borderColors[@(FSCalendarCellStateSelected)] = [UIColor clearColor];
         _borderColors[@(FSCalendarCellStateNormal)] = [UIColor clearColor];
@@ -88,11 +98,20 @@
     }
 }
 
-- (void)setSubtitleFont:(UIFont *)subtitleFont
+- (void)setExpenseFont:(UIFont *)expenseFont
 {
-    if (![_subtitleFont isEqual:subtitleFont]) {
-        _subtitleFont = subtitleFont;
-        self.calendar.calculator.subtitleHeight = -1;
+    if (![_expenseFont isEqual:expenseFont]) {
+        _expenseFont = expenseFont;
+        self.calendar.calculator.expenseHeight = -1;
+        [self.calendar setNeedsConfigureAppearance];
+    }
+}
+
+- (void)setIncomeFont:(UIFont *)incomeFont
+{
+    if (![_incomeFont isEqual:incomeFont]) {
+        _incomeFont = incomeFont;
+        self.calendar.calculator.incomeHeight = -1;
         [self.calendar setNeedsConfigureAppearance];
     }
 }
@@ -121,10 +140,18 @@
     }
 }
 
-- (void)setSubtitleOffset:(CGPoint)subtitleOffset
+- (void)setExpenseOffset:(CGPoint)expenseOffset
 {
-    if (!CGPointEqualToPoint(_subtitleOffset, subtitleOffset)) {
-        _subtitleOffset = subtitleOffset;
+    if (!CGPointEqualToPoint(_expenseOffset, expenseOffset)) {
+        _expenseOffset = expenseOffset;
+        [_calendar.collectionView.visibleCells makeObjectsPerformSelector:@selector(setNeedsLayout)];
+    }
+}
+
+- (void)setIncomeOffset:(CGPoint)incomeOffset
+{
+    if (!CGPointEqualToPoint(_incomeOffset, incomeOffset)) {
+        _incomeOffset = incomeOffset;
         [_calendar.collectionView.visibleCells makeObjectsPerformSelector:@selector(setNeedsLayout)];
     }
 }
@@ -220,79 +247,157 @@
     return _titleColors[@(FSCalendarCellStateWeekend)];
 }
 
-- (void)setSubtitleDefaultColor:(UIColor *)color
+- (void)setExpenseDefaultColor:(UIColor *)color
 {
     if (color) {
-        _subtitleColors[@(FSCalendarCellStateNormal)] = color;
+        _expenseColors[@(FSCalendarCellStateNormal)] = color;
     } else {
-        [_subtitleColors removeObjectForKey:@(FSCalendarCellStateNormal)];
+        [_expenseColors removeObjectForKey:@(FSCalendarCellStateNormal)];
     }
     [self.calendar setNeedsConfigureAppearance];
 }
 
--(UIColor *)subtitleDefaultColor
+-(UIColor *)expenseDefaultColor
 {
-    return _subtitleColors[@(FSCalendarCellStateNormal)];
+    return _expenseColors[@(FSCalendarCellStateNormal)];
 }
 
-- (void)setSubtitleSelectionColor:(UIColor *)color
+- (void)setExpenseSelectionColor:(UIColor *)color
 {
     if (color) {
-        _subtitleColors[@(FSCalendarCellStateSelected)] = color;
+        _expenseColors[@(FSCalendarCellStateSelected)] = color;
     } else {
-        [_subtitleColors removeObjectForKey:@(FSCalendarCellStateSelected)];
+        [_expenseColors removeObjectForKey:@(FSCalendarCellStateSelected)];
     }
     [self.calendar setNeedsConfigureAppearance];
 }
 
-- (UIColor *)subtitleSelectionColor
+- (UIColor *)expenseSelectionColor
 {
-    return _subtitleColors[@(FSCalendarCellStateSelected)];
+    return _expenseColors[@(FSCalendarCellStateSelected)];
 }
 
-- (void)setSubtitleTodayColor:(UIColor *)color
+- (void)setExpenseTodayColor:(UIColor *)color
 {
     if (color) {
-        _subtitleColors[@(FSCalendarCellStateToday)] = color;
+        _expenseColors[@(FSCalendarCellStateToday)] = color;
     } else {
-        [_subtitleColors removeObjectForKey:@(FSCalendarCellStateToday)];
+        [_expenseColors removeObjectForKey:@(FSCalendarCellStateToday)];
     }
     [self.calendar setNeedsConfigureAppearance];
 }
 
-- (UIColor *)subtitleTodayColor
+- (UIColor *)expenseTodayColor
 {
-    return _subtitleColors[@(FSCalendarCellStateToday)];
+    return _expenseColors[@(FSCalendarCellStateToday)];
 }
 
-- (void)setSubtitlePlaceholderColor:(UIColor *)color
+- (void)setexpensePlaceholderColor:(UIColor *)color
 {
     if (color) {
-        _subtitleColors[@(FSCalendarCellStatePlaceholder)] = color;
+        _expenseColors[@(FSCalendarCellStatePlaceholder)] = color;
     } else {
-        [_subtitleColors removeObjectForKey:@(FSCalendarCellStatePlaceholder)];
+        [_expenseColors removeObjectForKey:@(FSCalendarCellStatePlaceholder)];
     }
     [self.calendar setNeedsConfigureAppearance];
 }
 
-- (UIColor *)subtitlePlaceholderColor
+- (UIColor *)expensePlaceholderColor
 {
-    return _subtitleColors[@(FSCalendarCellStatePlaceholder)];
+    return _expenseColors[@(FSCalendarCellStatePlaceholder)];
 }
 
-- (void)setSubtitleWeekendColor:(UIColor *)color
+- (void)setExpenseWeekendColor:(UIColor *)color
 {
     if (color) {
-        _subtitleColors[@(FSCalendarCellStateWeekend)] = color;
+        _expenseColors[@(FSCalendarCellStateWeekend)] = color;
     } else {
-        [_subtitleColors removeObjectForKey:@(FSCalendarCellStateWeekend)];
+        [_expenseColors removeObjectForKey:@(FSCalendarCellStateWeekend)];
     }
     [self.calendar setNeedsConfigureAppearance];
 }
 
-- (UIColor *)subtitleWeekendColor
+- (UIColor *)expenseWeekendColor
 {
-    return _subtitleColors[@(FSCalendarCellStateWeekend)];
+    return _expenseColors[@(FSCalendarCellStateWeekend)];
+}
+
+
+///////////
+
+- (void)setIncomeDefaultColor:(UIColor *)color
+{
+    if (color) {
+        _incomeColors[@(FSCalendarCellStateNormal)] = color;
+    } else {
+        [_incomeColors removeObjectForKey:@(FSCalendarCellStateNormal)];
+    }
+    [self.calendar setNeedsConfigureAppearance];
+}
+
+-(UIColor *)incomeDefaultColor
+{
+    return _incomeColors[@(FSCalendarCellStateNormal)];
+}
+
+- (void)setIncomeSelectionColor:(UIColor *)color
+{
+    if (color) {
+        _incomeColors[@(FSCalendarCellStateSelected)] = color;
+    } else {
+        [_incomeColors removeObjectForKey:@(FSCalendarCellStateSelected)];
+    }
+    [self.calendar setNeedsConfigureAppearance];
+}
+
+- (UIColor *)incomeSelectionColor
+{
+    return _incomeColors[@(FSCalendarCellStateSelected)];
+}
+
+- (void)setIncomeTodayColor:(UIColor *)color
+{
+    if (color) {
+        _incomeColors[@(FSCalendarCellStateToday)] = color;
+    } else {
+        [_incomeColors removeObjectForKey:@(FSCalendarCellStateToday)];
+    }
+    [self.calendar setNeedsConfigureAppearance];
+}
+
+- (UIColor *)incomeTodayColor
+{
+    return _incomeColors[@(FSCalendarCellStateToday)];
+}
+
+- (void)setIncomePlaceholderColor:(UIColor *)color
+{
+    if (color) {
+        _incomeColors[@(FSCalendarCellStatePlaceholder)] = color;
+    } else {
+        [_incomeColors removeObjectForKey:@(FSCalendarCellStatePlaceholder)];
+    }
+    [self.calendar setNeedsConfigureAppearance];
+}
+
+- (UIColor *)incomePlaceholderColor
+{
+    return _incomeColors[@(FSCalendarCellStatePlaceholder)];
+}
+
+- (void)setIncomeWeekendColor:(UIColor *)color
+{
+    if (color) {
+        _incomeColors[@(FSCalendarCellStateWeekend)] = color;
+    } else {
+        [_incomeColors removeObjectForKey:@(FSCalendarCellStateWeekend)];
+    }
+    [self.calendar setNeedsConfigureAppearance];
+}
+
+- (UIColor *)incomeWeekendColor
+{
+    return _incomeColors[@(FSCalendarCellStateWeekend)];
 }
 
 - (void)setSelectionColor:(UIColor *)color
@@ -462,14 +567,24 @@
     return self.titleOffset.y;
 }
 
-- (void)setSubtitleVerticalOffset:(CGFloat)subtitleVerticalOffset
+- (void)setExpenseVerticalOffset:(CGFloat)expenseVerticalOffset
 {
-    self.subtitleOffset = CGPointMake(0, subtitleVerticalOffset);
+    self.expenseOffset = CGPointMake(0, expenseVerticalOffset);
 }
 
 - (CGFloat)subtitleVerticalOffset
 {
-    return self.subtitleOffset.y;
+    return self.expenseOffset.y;
+}
+
+- (void)setIncomeVerticalOffset:(CGFloat)incomeVerticalOffset
+{
+    self.incomeOffset = CGPointMake(0, incomeVerticalOffset);
+}
+
+- (CGFloat)incomeVerticalOffset
+{
+    return self.incomeOffset.y;
 }
 
 - (void)setEventColor:(UIColor *)eventColor
@@ -497,9 +612,14 @@
     self.titleFont = [UIFont fontWithName:self.titleFont.fontName size:titleTextSize];
 }
 
-- (void)setSubtitleTextSize:(CGFloat)subtitleTextSize
+- (void)setExpenseTextSize:(CGFloat)expenseTextSize
 {
-    self.subtitleFont = [UIFont fontWithName:self.subtitleFont.fontName size:subtitleTextSize];
+    self.expenseFont = [UIFont fontWithName:self.expenseFont.fontName size:expenseTextSize];
+}
+
+- (void)setIncomeTextSize:(CGFloat)incomeTextSize
+{
+    self.incomeFont = [UIFont fontWithName:self.incomeFont.fontName size:incomeTextSize];
 }
 
 - (void)setWeekdayTextSize:(CGFloat)weekdayTextSize

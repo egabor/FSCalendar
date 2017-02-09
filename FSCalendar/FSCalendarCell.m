@@ -16,7 +16,8 @@
 
 @property (readonly, nonatomic) UIColor *colorForCellFill;
 @property (readonly, nonatomic) UIColor *colorForTitleLabel;
-@property (readonly, nonatomic) UIColor *colorForSubtitleLabel;
+@property (readonly, nonatomic) UIColor *colorForExpenseLabel;
+@property (readonly, nonatomic) UIColor *colorForIncomeLabel;
 @property (readonly, nonatomic) UIColor *colorForCellBorder;
 @property (readonly, nonatomic) NSArray<UIColor *> *colorsForEvents;
 @property (readonly, nonatomic) CGFloat borderRadius;
@@ -40,9 +41,22 @@
 {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        //[self commonInit];
+        [self commonInit];
     }
     return self;
+}
+
+- (void)ibInit {
+    CAShapeLayer *shapeLayer;
+    
+    shapeLayer = [CAShapeLayer layer];
+    shapeLayer.backgroundColor = [UIColor clearColor].CGColor;
+    shapeLayer.borderWidth = 1.0;
+    shapeLayer.borderColor = [UIColor clearColor].CGColor;
+    shapeLayer.opacity = 0;
+    [self.contentView.layer insertSublayer:shapeLayer below:_titleLabel.layer];
+    self.shapeLayer = shapeLayer;
+    [self layoutSubviews];
 }
 
 - (void)commonInit
@@ -50,19 +64,35 @@
     UILabel *label;
     CAShapeLayer *shapeLayer;
     UIImageView *imageView;
+    UIImageView *view;
     FSCalendarEventIndicator *eventIndicator;
     
     label = [[UILabel alloc] initWithFrame:CGRectZero];
-    label.textAlignment = NSTextAlignmentCenter;
+    label.textAlignment = NSTextAlignmentRight;
     label.textColor = [UIColor blackColor];
+    label.backgroundColor = [UIColor clearColor];
     [self.contentView addSubview:label];
     self.titleLabel = label;
     
     label = [[UILabel alloc] initWithFrame:CGRectZero];
-    label.textAlignment = NSTextAlignmentCenter;
-    label.textColor = [UIColor lightGrayColor];
+    label.textAlignment = NSTextAlignmentRight;
+    label.textColor = [UIColor redColor];
+    label.backgroundColor = [UIColor clearColor];
     [self.contentView addSubview:label];
-    self.subtitleLabel = label;
+    self.expenseLabel = label;
+    
+    label = [[UILabel alloc] initWithFrame:CGRectZero];
+    label.textAlignment = NSTextAlignmentRight;
+    label.textColor = [UIColor greenColor];
+    label.backgroundColor = [UIColor clearColor];
+    [self.contentView addSubview:label];
+    self.incomeLabel = label;
+    
+    view = [[UIView alloc] initWithFrame:CGRectZero];
+    view.backgroundColor = [UIColor clearColor];
+    [self.contentView addSubview:view];
+    self.paddingView = view;
+    
     
     shapeLayer = [CAShapeLayer layer];
     shapeLayer.backgroundColor = [UIColor clearColor].CGColor;
@@ -93,39 +123,61 @@
     [super layoutSubviews];
     
     _titleLabel.text = self.title;
-    if (_subtitle) {
-        _subtitleLabel.text = _subtitle;
-        if (_subtitleLabel.hidden) {
-            _subtitleLabel.hidden = NO;
+    if (_expense) {
+        _expenseLabel.text = _expense;
+        if (_expenseLabel.hidden) {
+            _expenseLabel.hidden = NO;
         }
     } else {
-        if (!_subtitleLabel.hidden) {
-            _subtitleLabel.hidden = YES;
+        if (!_expenseLabel.hidden) {
+            _expenseLabel.hidden = YES;
         }
     }
     
-    if (_subtitle) {
+    if (_income) {
+        _incomeLabel.text = _income;
+        if (_incomeLabel.hidden) {
+            _incomeLabel.hidden = NO;
+        }
+    } else {
+        if (!_incomeLabel.hidden) {
+            _incomeLabel.hidden = YES;
+        }
+    }
+    
+    if (_expense || _income) {
         CGFloat titleHeight = self.calendar.calculator.titleHeight;
-        CGFloat subtitleHeight = self.calendar.calculator.subtitleHeight;
-        
-        CGFloat height = titleHeight + subtitleHeight;
+        CGFloat expenseHeight = self.calendar.calculator.expenseHeight;
+        CGFloat incomeHeight = self.calendar.calculator.incomeHeight;
+
+        CGFloat height = titleHeight + expenseHeight;
         _titleLabel.frame = CGRectMake(
                                        self.preferredTitleOffset.x,
-                                       (self.contentView.fs_height*5.0/6.0-height)*0.5+self.preferredTitleOffset.y,
-                                       self.contentView.fs_width,
+                                       self.preferredTitleOffset.y,
+                                       self.contentView.fs_width*0.8f,
                                        titleHeight
                                        );
-        _subtitleLabel.frame = CGRectMake(
-                                          self.preferredSubtitleOffset.x,
-                                          (_titleLabel.fs_bottom-self.preferredTitleOffset.y) - (_titleLabel.fs_height-_titleLabel.font.pointSize)+self.preferredSubtitleOffset.y,
-                                          self.contentView.fs_width,
-                                          subtitleHeight
+        _expenseLabel.frame = CGRectMake(
+                                          self.preferredExpenseOffset.x,
+                                          10.0f+(_titleLabel.fs_bottom-self.preferredTitleOffset.y) - (_titleLabel.fs_height-_titleLabel.font.pointSize)+self.preferredExpenseOffset.y,
+                                          self.contentView.fs_width*0.8f,
+                                          expenseHeight
                                           );
+    
+        _incomeLabel.frame = CGRectMake(
+                                     self.preferredIncomeOffset.x,
+                                     _expenseLabel.fs_bottom,
+                                     self.contentView.fs_width*0.8f,
+                                     incomeHeight
+                                     );
+        
+        _paddingView.frame = CGRectMake(self.preferredIncomeOffset.x, _incomeLabel.fs_bottom, self.contentView.fs_width*0.8f, 
+                                        0.0f);
     } else {
         _titleLabel.frame = CGRectMake(
                                        self.preferredTitleOffset.x,
                                        self.preferredTitleOffset.y,
-                                       self.contentView.fs_width,
+                                       self.contentView.fs_width*0.8f,
                                        floor(self.contentView.fs_height*5.0/6.0)
                                        );
     }
@@ -134,27 +186,29 @@
     
     
     
-    CGFloat titleHeight = self.bounds.size.height*5.0/6.0;
+    /*CGFloat titleHeight = self.bounds.size.height*5.0/6.0;
     CGFloat diameter = MIN(self.bounds.size.height*5.0/6.0,self.bounds.size.width);
     diameter = diameter > FSCalendarStandardCellDiameter ? (diameter - (diameter-FSCalendarStandardCellDiameter)*0.5) : diameter;
-    _shapeLayer.frame = CGRectMake((self.bounds.size.width-diameter)/2,
+    */
+    _shapeLayer.frame = self.bounds;/*CGRectMake((self.bounds.size.width-diameter)/2,
                                    (titleHeight-diameter)/2,
                                    diameter,
-                                   diameter);
+                                   diameter);*/
     
     CGPathRef path = [UIBezierPath bezierPathWithRoundedRect:_shapeLayer.bounds
-                                                cornerRadius:CGRectGetWidth(_shapeLayer.bounds)*0.5*self.borderRadius].CGPath;
-    if (!CGPathEqualToPath(_shapeLayer.path,path)) {
+                                                cornerRadius:0.0f/*CGRectGetWidth(_shapeLayer.bounds)*0.5*self.borderRadius*/].CGPath;
+    
+     if (!CGPathEqualToPath(_shapeLayer.path,path)) {
         _shapeLayer.path = path;
     }
     
-    CGFloat eventSize = _shapeLayer.frame.size.height/6.0;
+    /*CGFloat eventSize = _shapeLayer.frame.size.height/6.0;
     _eventIndicator.frame = CGRectMake(
                                        self.preferredEventOffset.x,
                                        CGRectGetMaxY(_shapeLayer.frame)+eventSize*0.17+self.preferredEventOffset.y,
                                        self.fs_width,
                                        eventSize*0.83
-                                      );
+                                      );*/
     
 }
 
@@ -205,14 +259,25 @@
     if (![titleFont isEqual:_titleLabel.font]) {
         _titleLabel.font = titleFont;
     }
-    if (_subtitle) {
-        textColor = self.colorForSubtitleLabel;
-        if (![textColor isEqual:_subtitleLabel.textColor]) {
-            _subtitleLabel.textColor = textColor;
+    if (_expense) {
+        textColor = self.colorForExpenseLabel;
+        if (![textColor isEqual:_expenseLabel.textColor]) {
+            _expenseLabel.textColor = textColor;
         }
-        titleFont = self.calendar.appearance.subtitleFont;
-        if (![titleFont isEqual:_subtitleLabel.font]) {
-            _subtitleLabel.font = titleFont;
+        titleFont = self.calendar.appearance.expenseFont;
+        if (![titleFont isEqual:_expenseLabel.font]) {
+            _expenseLabel.font = titleFont;
+        }
+    }
+    
+    if (_income) {
+        textColor = self.colorForIncomeLabel;
+        if (![textColor isEqual:_incomeLabel.textColor]) {
+            _incomeLabel.textColor = textColor;
+        }
+        titleFont = self.calendar.appearance.incomeFont;
+        if (![titleFont isEqual:_incomeLabel.font]) {
+            _incomeLabel.font = titleFont;
         }
     }
     
@@ -237,7 +302,7 @@
         }
         
         CGPathRef path = [UIBezierPath bezierPathWithRoundedRect:_shapeLayer.bounds
-                                                    cornerRadius:CGRectGetWidth(_shapeLayer.bounds)*0.5*self.borderRadius].CGPath;
+                                                    cornerRadius:0.0f/*CGRectGetWidth(_shapeLayer.bounds)*0.5*self.borderRadius*/].CGPath;
         if (!CGPathEqualToPath(_shapeLayer.path, path)) {
             _shapeLayer.path = path;
         }
@@ -297,12 +362,20 @@
     return self.preferredTitleDefaultColor ?: [self colorForCurrentStateInDictionary:_appearance.titleColors];
 }
 
-- (UIColor *)colorForSubtitleLabel
+- (UIColor *)colorForExpenseLabel
 {
     if (self.selected) {
-        return self.preferredSubtitleSelectionColor ?: [self colorForCurrentStateInDictionary:_appearance.subtitleColors];
+        return self.preferredExpenseSelectionColor ?: [self colorForCurrentStateInDictionary:_appearance.expenseColors];
     }
-    return self.preferredSubtitleDefaultColor ?: [self colorForCurrentStateInDictionary:_appearance.subtitleColors];
+    return self.preferredExpenseDefaultColor ?: [self colorForCurrentStateInDictionary:_appearance.expenseColors];
+}
+
+- (UIColor *)colorForIncomeLabel
+{
+    if (self.selected) {
+        return self.preferredIncomeSelectionColor ?: [self colorForCurrentStateInDictionary:_appearance.incomeColors];
+    }
+    return self.preferredIncomeDefaultColor ?: [self colorForCurrentStateInDictionary:_appearance.incomeColors];
 }
 
 - (UIColor *)colorForCellBorder
@@ -345,7 +418,8 @@
 }
 
 OFFSET_PROPERTY(preferredTitleOffset, PreferredTitleOffset, _appearance.titleOffset);
-OFFSET_PROPERTY(preferredSubtitleOffset, PreferredSubtitleOffset, _appearance.subtitleOffset);
+OFFSET_PROPERTY(preferredExpenseOffset, PreferredExpenseOffset, _appearance.expenseOffset);
+OFFSET_PROPERTY(preferredIncomeOffset, PreferredIncomeOffset, _appearance.incomeOffset);
 OFFSET_PROPERTY(preferredImageOffset, PreferredImageOffset, _appearance.imageOffset);
 OFFSET_PROPERTY(preferredEventOffset, PreferredEventOffset, _appearance.eventOffset);
 
@@ -360,11 +434,22 @@ OFFSET_PROPERTY(preferredEventOffset, PreferredEventOffset, _appearance.eventOff
     }
 }
 
-- (void)setSubtitle:(NSString *)subtitle
+- (void)setExpense:(NSString *)expense
 {
-    if (![_subtitle isEqualToString:subtitle]) {
-        BOOL diff = (subtitle.length && !_subtitle.length) || (_subtitle.length && !subtitle.length);
-        _subtitle = subtitle;
+    if (![_expense isEqualToString:expense]) {
+        BOOL diff = (expense.length && !_expense.length) || (_expense.length && !expense.length);
+        _expense = expense;
+        if (diff) {
+            [self setNeedsLayout];
+        }
+    }
+}
+
+- (void)setIncome:(NSString *)income
+{
+    if (![_income isEqualToString:income]) {
+        BOOL diff = (income.length && !_income.length) || (_income.length && !income.length);
+        _income = income;
         if (diff) {
             [self setNeedsLayout];
         }

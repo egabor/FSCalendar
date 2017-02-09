@@ -60,7 +60,8 @@
 
 @property (readonly, nonatomic) NSDictionary *backgroundColors;
 @property (readonly, nonatomic) NSDictionary *titleColors;
-@property (readonly, nonatomic) NSDictionary *subtitleColors;
+@property (readonly, nonatomic) NSDictionary *expenseColors;
+@property (readonly, nonatomic) NSDictionary *incomeColors;
 @property (readonly, nonatomic) NSDictionary *borderColors;
 
 @end

@@ -71,7 +71,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Asks the dataSource for a subtitle for the specific date under the day text.
  */
-- (nullable NSString *)calendar:(FSCalendar *)calendar subtitleForDate:(NSDate *)date;
+- (nullable NSString *)calendar:(FSCalendar *)calendar expenseForDate:(NSDate *)date;
+- (nullable NSString *)calendar:(FSCalendar *)calendar incomeForDate:(NSDate *)date;
+
 
 /**
  * Asks the dataSource for an image for the specific date.
@@ -196,12 +198,14 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Asks the delegate for subtitle text color in unselected state for the specific date.
  */
-- (nullable UIColor *)calendar:(FSCalendar *)calendar appearance:(FSCalendarAppearance *)appearance subtitleDefaultColorForDate:(NSDate *)date;
+- (nullable UIColor *)calendar:(FSCalendar *)calendar appearance:(FSCalendarAppearance *)appearance expenseDefaultColorForDate:(NSDate *)date;
+- (nullable UIColor *)calendar:(FSCalendar *)calendar appearance:(FSCalendarAppearance *)appearance incomeDefaultColorForDate:(NSDate *)date;
 
 /**
  * Asks the delegate for subtitle text color in selected state for the specific date.
  */
-- (nullable UIColor *)calendar:(FSCalendar *)calendar appearance:(FSCalendarAppearance *)appearance subtitleSelectionColorForDate:(NSDate *)date;
+- (nullable UIColor *)calendar:(FSCalendar *)calendar appearance:(FSCalendarAppearance *)appearance expenseSelectionColorForDate:(NSDate *)date;
+- (nullable UIColor *)calendar:(FSCalendar *)calendar appearance:(FSCalendarAppearance *)appearance incomeSelectionColorForDate:(NSDate *)date;
 
 /**
  * Asks the delegate for event colors for the specific date.
@@ -231,7 +235,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Asks the delegate for an offset for subtitle for the specific date.
  */
-- (CGPoint)calendar:(FSCalendar *)calendar appearance:(FSCalendarAppearance *)appearance subtitleOffsetForDate:(NSDate *)date;
+- (CGPoint)calendar:(FSCalendar *)calendar appearance:(FSCalendarAppearance *)appearance expenseOffsetForDate:(NSDate *)date;
+- (CGPoint)calendar:(FSCalendar *)calendar appearance:(FSCalendarAppearance *)appearance incomeOffsetForDate:(NSDate *)date;
 
 /**
  * Asks the delegate for an offset for image for the specific date.
@@ -562,7 +567,8 @@ IB_DESIGNABLE
 
 @property (assign, nonatomic) IBInspectable BOOL     adjustsFontSizeToFitContentSize;
 @property (assign, nonatomic) IBInspectable CGFloat  titleTextSize;
-@property (assign, nonatomic) IBInspectable CGFloat  subtitleTextSize;
+@property (assign, nonatomic) IBInspectable CGFloat  expenseTextSize;
+@property (assign, nonatomic) IBInspectable CGFloat  incomeTextSize;
 @property (assign, nonatomic) IBInspectable CGFloat  weekdayTextSize;
 @property (assign, nonatomic) IBInspectable CGFloat  headerTitleTextSize;
 
@@ -580,11 +586,17 @@ IB_DESIGNABLE
 @property (strong, nonatomic) IBInspectable UIColor  *titlePlaceholderColor;
 @property (strong, nonatomic) IBInspectable UIColor  *titleWeekendColor;
 
-@property (strong, nonatomic) IBInspectable UIColor  *subtitleDefaultColor;
-@property (strong, nonatomic) IBInspectable UIColor  *subtitleSelectionColor;
-@property (strong, nonatomic) IBInspectable UIColor  *subtitleTodayColor;
-@property (strong, nonatomic) IBInspectable UIColor  *subtitlePlaceholderColor;
-@property (strong, nonatomic) IBInspectable UIColor  *subtitleWeekendColor;
+@property (strong, nonatomic) IBInspectable UIColor  *expenseDefaultColor;
+@property (strong, nonatomic) IBInspectable UIColor  *expenseSelectionColor;
+@property (strong, nonatomic) IBInspectable UIColor  *expenseTodayColor;
+@property (strong, nonatomic) IBInspectable UIColor  *expensePlaceholderColor;
+@property (strong, nonatomic) IBInspectable UIColor  *expenseWeekendColor;
+
+@property (strong, nonatomic) IBInspectable UIColor  *incomeDefaultColor;
+@property (strong, nonatomic) IBInspectable UIColor  *incomeSelectionColor;
+@property (strong, nonatomic) IBInspectable UIColor  *incomeTodayColor;
+@property (strong, nonatomic) IBInspectable UIColor  *incomePlaceholderColor;
+@property (strong, nonatomic) IBInspectable UIColor  *incomeWeekendColor;
 
 @property (strong, nonatomic) IBInspectable UIColor  *selectionColor;
 @property (strong, nonatomic) IBInspectable UIColor  *todayColor;

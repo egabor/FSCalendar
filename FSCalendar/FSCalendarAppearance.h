@@ -53,7 +53,8 @@ typedef NS_OPTIONS(NSUInteger, FSCalendarSeparators) {
 /**
  * The font of the subtitle text.
  */
-@property (strong, nonatomic) UIFont   *subtitleFont;
+@property (strong, nonatomic) UIFont   *expenseFont;
+@property (strong, nonatomic) UIFont   *incomeFont;
 
 /**
  * The font of the weekday text.
@@ -73,7 +74,9 @@ typedef NS_OPTIONS(NSUInteger, FSCalendarSeparators) {
 /**
  * The offset of the day text from default position.
  */
-@property (assign, nonatomic) CGPoint  subtitleOffset;
+@property (assign, nonatomic) CGPoint  expenseOffset;
+@property (assign, nonatomic) CGPoint  incomeOffset;
+
 
 /**
  * The offset of the event dots from default position.
@@ -143,27 +146,33 @@ typedef NS_OPTIONS(NSUInteger, FSCalendarSeparators) {
 /**
  * The subtitle text color for unselected state.
  */
-@property (strong, nonatomic) UIColor  *subtitleDefaultColor;
+@property (strong, nonatomic) UIColor  *expenseDefaultColor;
+@property (strong, nonatomic) UIColor  *incomeDefaultColor;
 
 /**
  * The subtitle text color for selected state.
  */
-@property (strong, nonatomic) UIColor  *subtitleSelectionColor;
+@property (strong, nonatomic) UIColor  *expenseSelectionColor;
+@property (strong, nonatomic) UIColor  *incomeSelectionColor;
+
 
 /**
  * The subtitle text color for today in the calendar.
  */
-@property (strong, nonatomic) UIColor  *subtitleTodayColor;
+@property (strong, nonatomic) UIColor  *expenseTodayColor;
+@property (strong, nonatomic) UIColor  *incomeTodayColor;
 
 /**
  * The subtitle text color for days out of current month.
  */
-@property (strong, nonatomic) UIColor  *subtitlePlaceholderColor;
+@property (strong, nonatomic) UIColor  *expensePlaceholderColor;
+@property (strong, nonatomic) UIColor  *incomePlaceholderColor;
 
 /**
  * The subtitle text color for weekend.
  */
-@property (strong, nonatomic) UIColor  *subtitleWeekendColor;
+@property (strong, nonatomic) UIColor  *expenseWeekendColor;
+@property (strong, nonatomic) UIColor  *incomeWeekendColor;
 
 /**
  * The fill color of the shape for selected state.
